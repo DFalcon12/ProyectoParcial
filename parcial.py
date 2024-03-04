@@ -6,11 +6,11 @@ M = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris consectetur
 
 
 hashed_msg = hashlib.sha256(M.encode('utf-8')).hexdigest()
+hashMsgInt = int(hashed_msg, 16)
+
 M_bytes = M.encode('utf-8')
 
-# Calcular el hash SHA-256 del mensaje
-hash_sha256 = hashlib.sha256(M_bytes).hexdigest()
-print("SHA-256 Hash:", hash_sha256)
+
 
 msg_div = [M[i:i+128] for i in range (0, len(M), 128)]
 print(len(msg_div))
@@ -51,32 +51,28 @@ print("dB", dB , "\n")
 msgs_encrypted = []
 #Cifrar los mensajes
 for j in msg_div:   
-    m = int.from_bytes(str(j).encode('utf-8'), byteorder='big')
-    #print("mensaje convertido en entero: ", m ,"\n")
-    #print(m , "\n")
+    m = int.from_bytes(j.encode('utf-8'), byteorder='big')
     c = pow(m,e,nB)
     print("Mensaje cifrado: ", c, "\n")
     msgs_encrypted.append(c)
 
+#Desencriptar
 msgs_dc = []
 for i in msgs_encrypted:
     des = pow(i, dB, nB)
-    #print ("Mensaje descifrado: ", des, "\n")
-    #Convertir el mensaje a texto
-    #msg_final = int.to_bytes(des, len(M), byteorder = 'big').decode('utf-8')
     msg_final = des.to_bytes((des.bit_length() + 7) // 8, byteorder='big').decode('utf-8')
     print("Mensaje final: ", msg_final, "\n")
     msgs_dc.append(msg_final)
 
 print(msgs_dc)
 
-decrypted_msgs = []
-
-joined_msg = "".join(decrypted_msgs)
+joined_msg = "".join(msgs_dc)
 
 print("Mensaje descifrado y unido: ", joined_msg)
+msgReceivedMsgHash = hashlib.sha256(joined_msg.encode()).hexdigest()
+hashIntRecevied = int(msgReceivedMsgHash, 16)
 
-if M == joined_msg:
+if hashMsgInt == hashIntRecevied:
     print("Los mensajes son iguales")
 else:
     print("Los mensajes no son iguales")
